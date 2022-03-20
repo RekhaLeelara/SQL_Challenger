@@ -6,10 +6,12 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 const sqlQuery = require('./db')
 var inquirer = require('inquirer');
+data = [];
+let choiceVal = [];
 
 
 // TODO: Create an array of questions for user input
-const questions = [
+const department = [
     {
         type: 'input',
         name: 'departmentName',
@@ -21,19 +23,44 @@ const questions = [
             return true;
         }
 
+    }
+];
+
+
+const choiceQuestion = [
+    {
+        type: 'list',
+        message: "Which department would you like to add",
+        choices: choiceVal,
+        name: 'Choice'
     },
+]
+
+const addRole = [
     {
         type: 'input',
-        name: 'nameRole',
-        message: 'What is the name of the department',
+        name: 'roleName',
+        message: 'What is the name of the role',
         validate: function (answer) {
             if (answer.length < 1) {
-                return console.log("Department is mandatory");
+                return console.log("role is mandatory");
             }
             return true;
         }
 
     },
+    {
+        type: 'input',
+        name: 'salary',
+        message: 'What is the salary',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("salary is mandatory");
+            }
+            return true;
+        }
+
+    }
 ];
 
 //Generic questions to loop through
@@ -57,23 +84,36 @@ function init() {
                 sqlQuery.findAllDepartments().then(([data]) => {
                     console.table(data);
                 })
+                init()
             }
-            elseif(response.Choice == 'View All Roles')
-            {
+            else if (response.Choice == 'View All Roles') {
                 sqlQuery.viewAllRoles().then(([data]) => {
                     console.table(data);
                 })
+                init()
             }
-            elseif(response.Choice == 'View All Employees')
-            {
+            else if (response.Choice == 'View All Employees') {
                 sqlQuery.viewAllEmployees().then(([data]) => {
                     console.table(data);
                 })
+                init()
             }
-            elseif(response.Choice == 'Add Role')
-            {
-                sqlQuery.viewAllEmployees().then(([data]) => {
-                    console.table(data);
+            else if (response.Choice == 'Add Role') {
+
+                sqlQuery.findAllDepartments().then(([data]) => {
+                    console.log(data);
+                })
+
+                const choiceVal = data.map(({ id, names }) => ({
+                    name: names,
+                    value: id
+                }));
+
+                console.log("data" + data);
+                console.log("choiceVal" + choiceVal);
+
+                inquirer.prompt(choiceQuestion).then((response) => {
+                    console.log("response" + response);
                 })
             }
         }
