@@ -4,11 +4,20 @@ const mysql = require('mysql2');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
-const sqlQuery = require('./db')
+const sqlQuery = require('./db/index')
 var inquirer = require('inquirer');
 data = [];
 let choiceVal = [];
+const { prompt } = require("inquirer");
+var input;
 
+
+var arr = [];
+var roleName;
+var salary;
+
+var rolearr = [];
+var managerarr = [];
 
 // TODO: Create an array of questions for user input
 const department = [
@@ -26,15 +35,21 @@ const department = [
     }
 ];
 
-
-const choiceQuestion = [
+const addDept = [
     {
-        type: 'list',
-        message: "Which department would you like to add",
-        choices: choiceVal,
-        name: 'Choice'
-    },
+        type: 'input',
+        name: 'deptName',
+        message: 'What is the name of the department',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("department name is mandatory");
+            }
+            return true;
+        }
+
+    }
 ]
+
 
 const addRole = [
     {
@@ -60,6 +75,51 @@ const addRole = [
             return true;
         }
 
+    },
+    {
+        type: 'list',
+        message: "Which department would you like to add",
+        choices: arr,
+        name: 'Choice'
+    },
+];
+
+const addEmployee = [
+    {
+        type: 'input',
+        name: 'firstName',
+        message: 'What is the first name of the employee?',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("first name is mandatory");
+            }
+            return true;
+        }
+
+    },
+    {
+        type: 'input',
+        name: 'lastName',
+        message: 'What is the last name of the employee?',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("last name is mandatory");
+            }
+            return true;
+        }
+
+    },
+    {
+        type: 'list',
+        message: "Which role would you like to assign?",
+        choices: rolearr,
+        name: 'Choice'
+    },
+    {
+        type: 'list',
+        message: "Which manager would you like the employee to map to?",
+        choices: managerarr,
+        name: 'Choice'
     }
 ];
 
@@ -78,7 +138,6 @@ const genericQuest = [
 function init() {
     try {
         inquirer.prompt(genericQuest).then((response) => {
-            console.log("Testing123");
             console.log(response);
             if (response.Choice == 'View All Departments') {
                 sqlQuery.findAllDepartments().then(([data]) => {
@@ -98,24 +157,44 @@ function init() {
                 })
                 init()
             }
+
             else if (response.Choice == 'Add Role') {
-
                 sqlQuery.findAllDepartments().then(([data]) => {
-                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        arr[i] = data[i].names;
+                    }
                 })
+                console.log("array data" + arr);
 
-                const choiceVal = data.map(({ id, names }) => ({
-                    name: names,
-                    value: id
-                }));
-
-                console.log("data" + data);
-                console.log("choiceVal" + choiceVal);
-
-                inquirer.prompt(choiceQuestion).then((response) => {
-                    console.log("response" + response);
+                inquirer.prompt(addRole).then((response) => {
+                    sqlQuery.getDepartmentid(input).then(([data]) => {
+                        sqlQuery.addRole(response.roleName, response.salary, data[1].id);
+                    })
                 })
             }
+            else if (response.Choice == 'Add Department') {
+                
+                inquirer.prompt(addDept).then((response) => {
+                    sqlQuery.addDepartment(response.deptName).then(([data]) => {
+                        console.table(data);
+                    })
+                })
+            }
+            else if (response.Choice == 'Add Employee') {
+                sqlQuery.viewAllRoles().then(([data]) => {
+                    for (i = 0; i < data.length; i++) {
+                        rolearr[i] = data[i].names;
+                    }
+                })
+                console.log("array data" + arr);
+
+                inquirer.prompt(addRole).then((response) => {
+                    sqlQuery.getDepartmentid(input).then(([data]) => {
+                        sqlQuery.addRole(response.roleName, response.salary, data[1].id);
+                    })
+                })
+            }
+
         }
         )
     } catch (err) {
@@ -138,6 +217,28 @@ function init() {
 // db.query('SELECT * FROM departments', function (err, results) {
 //   console.log(results);
 // });
+
+function deptdata() {
+
+    sqlQuery.findAllDepartments().then(([data]) => {
+
+        var arr = [];
+        for (i = 0; i < data.length; i++) {
+            arr[i] = data[i].names;
+        }
+
+        inquirer.prompt(choiceQuestion).then((response) => {
+            input = response.Choice;
+            console.log("user input: " + input);
+        })
+    })
+}
+
+function addingRole() {
+    sqlQuery.addRole(roleName, salary, input).then(([data]) => {
+        console.table(data);
+    })
+}
 
 init()
 
