@@ -1,10 +1,8 @@
 # # Description
 
-Project Description: This functionality helps the team to generate an webpage (html) with the following team details using node js
-
-Manager - Name, role, Email id, office number
-Intern- Name, role, Email id, School
-Engineer- Name, role, Email id, Github
+AS A business owner
+I WANT to be able to view and manage the departments, roles, and employees in my company
+SO THAT I can organize and plan my business
 
 ## Screenshot
 ![testing](./Develop/assets/images/Application.png)
@@ -12,15 +10,23 @@ Engineer- Name, role, Email id, Github
 
 ## GitHub Repo
 
-Functionality Recording: 
+https://github.com/RekhaLeelara/SQL_Challenger
+
+## Video Walkthrough
+
+https://drive.google.com/drive/folders/1YK1wm8a_94JniBnXKRlSObI2GlCeW8tw?usp=sharing
+
+## Built With
+
+Node JS
+Express
+MySQL Javascript
 
 ## Usage
 
 Go to the terminal > enter node index.js
-Enter the answer for the manager questions
-Choose Engineer/Intern and answer questions
-The user can add as many Engineer/Intern as he/she wants
-Open index.html page to view the details in the webpage
+Choose the options by using up and down arrow
+The user would get the output based on the selection
 
 ## Support
 
@@ -28,7 +34,7 @@ N/A
 
 ## Roadmap
 
-Addition roles and UI can be modified based on the user needs
+API's and frond end would be a great plan to enhance the application
 
 ## License
 

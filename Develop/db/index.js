@@ -37,7 +37,7 @@ class sqlQueries{
 
   addEmployee(firstName, lastName, fetchRoleId, managerId){
 
-    this.connection.promise().query("INSERT INTO roles (first_name, last_name, role_id, manager_id) VALUES ('"+firstName+"','"+lastName+"','"+fetchRoleId+"','"+managerId+"');")
+    this.connection.promise().query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('"+firstName+"','"+lastName+"','"+fetchRoleId+"','"+managerId+"');")
   
     }
 
@@ -46,13 +46,17 @@ class sqlQueries{
   }
 
   viewAllManagerids(fName, lName){
-    return this.connection.promise().query("select first_name, last_name from employee where first_name = '"+fName+"' and last_name = '"+lName+"' ;")
+    return this.connection.promise().query("select id from employee where first_name = '"+fName+"' and last_name = '"+lName+"' ;")
   }
 
   addDepartment(departmentName){
 
     return this.connection.promise().query("INSERT INTO department (names) VALUES ('"+departmentName+"');")
   
+    }
+
+    updateEmployeeRole(roleid, employeeid){
+      return this.connection.promise().query("UPDATE employee SET role_id = '"+roleid+"' where id='"+employeeid+"' ;") 
     }
 
 

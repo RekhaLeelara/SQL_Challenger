@@ -1,27 +1,20 @@
+// Import required functions
 const express = require('express');
 // Import and require mysql2
 const mysql = require('mysql2');
 
+//Global variables/constants
 const PORT = process.env.PORT || 3001;
 const app = express();
 const sqlQuery = require('./db/index')
 var inquirer = require('inquirer');
-data = [];
-let choiceVal = [];
-const { prompt } = require("inquirer");
 var input;
-
-
 var arr = [];
-var roleName;
-var salary;
-
 var rolearr = [];
 var managerarr = [];
 var fetchRoleId;
-var managerName = "";
 
-// TODO: Create an array of questions for user input
+//Department questions to enter user input
 const department = [
     {
         type: 'input',
@@ -37,6 +30,8 @@ const department = [
     }
 ];
 
+
+//Add department questions to enter user input
 const addDept = [
     {
         type: 'input',
@@ -53,6 +48,7 @@ const addDept = [
 ]
 
 
+//Add Role to enter user input
 const addRole = [
     {
         type: 'input',
@@ -86,6 +82,7 @@ const addRole = [
     },
 ];
 
+//Add Employee questions to enter user input
 const addEmployee = [
     {
         type: 'input',
@@ -109,7 +106,6 @@ const addEmployee = [
             }
             return true;
         }
-
     },
     {
         type: 'list',
@@ -125,6 +121,33 @@ const addEmployee = [
     }
 ];
 
+//update role table questions to enter user input
+const updateRole = [
+    {
+        type: 'input',
+        name: 'updateRoleId',
+        message: 'What is the role id to be updated?',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("Role Id is mandatory");
+            }
+            return true;
+        }
+
+    },
+    {
+        type: 'input',
+        name: 'updateemployeeId',
+        message: 'Enter the right employee id to update the role?',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("employee id is mandatory");
+            }
+            return true;
+        }
+    },
+]
+
 //Generic questions to loop through
 const genericQuest = [
     {
@@ -136,23 +159,29 @@ const genericQuest = [
 ]
 
 
-// TODO: Create a function to initialize app
+// Handling all prompts and logics
 function init() {
     try {
         inquirer.prompt(genericQuest).then((response) => {
             console.log(response);
+
+            // Handling logic when user choose option 'View All Departments'
             if (response.Choice == 'View All Departments') {
                 sqlQuery.findAllDepartments().then(([data]) => {
                     console.table(data);
                 })
                 init()
             }
+
+            // Handling logic when user choose option 'View All Roles'
             else if (response.Choice == 'View All Roles') {
                 sqlQuery.viewAllRoles().then(([data]) => {
                     console.table(data);
                 })
                 init()
             }
+
+            // Handling logic when user choose option 'View All Employees'
             else if (response.Choice == 'View All Employees') {
                 sqlQuery.viewAllEmployees().then(([data]) => {
                     console.table(data);
@@ -160,6 +189,7 @@ function init() {
                 init()
             }
 
+            // Handling logic when user choose option 'Add Role'
             else if (response.Choice == 'Add Role') {
                 sqlQuery.findAllDepartments().then(([data]) => {
                     for (i = 0; i < data.length; i++) {
@@ -174,6 +204,8 @@ function init() {
                     })
                 })
             }
+
+            // Handling logic when user choose option 'Add Department'
             else if (response.Choice == 'Add Department') {
                 
                 inquirer.prompt(addDept).then((response) => {
@@ -182,6 +214,19 @@ function init() {
                     })
                 })
             }
+
+            // Handling logic when user choose option 'Update Employee Role'
+            else if (response.Choice == 'Update Employee Role') {
+                inquirer.prompt(updateRole).then((response) => {
+                sqlQuery.updateEmployeeRole(response.updateRoleId, response.updateemployeeId).then(([data]) => {
+
+                    init()
+                })
+            })
+                
+            }
+
+            // Handling logic when user choose option 'Add Employee'
             else if (response.Choice == 'Add Employee') {
                 sqlQuery.viewAllRoles().then(([data]) => {
                     for (i = 0; i < data.length; i++) {
@@ -199,18 +244,14 @@ function init() {
                 console.log("array data" + managerarr);
 
                 inquirer.prompt(addEmployee).then((response) => {
-                    console.log(response);
-                    splitArr = managerName.split(" ");
-                    var fName = splitArr[1];
-                    var lName = splitArr[2];
-                    console.log("fName"+fName);
-                    console.log("lName"+lName);
-                    sqlQuery.getroleid(roleName).then(([data]) => {
-                        console.table(data);
+                    splitArr = response.managerName.split(" ");
+                    var fName = splitArr[0];
+                    var lName = splitArr[1];
+                    sqlQuery.getroleid(response.roleName).then(([data]) => {
                         fetchRoleId = data[1].id;
                     })
                     sqlQuery.viewAllManagerids(fName, lName).then(([data]) => {
-                        sqlQuery.addRole(firstName, lastName, fetchRoleId, data[1].id);
+                        sqlQuery.addEmployee(response.firstName, response.lastName, fetchRoleId, data[1].id);
                     })
                 })
             }
@@ -218,48 +259,12 @@ function init() {
         }
         )
     } catch (err) {
-        console.log("Department query not run due to a problem");
+        console.log("Unable to display the data due to a problem");
     }
 
 }
 
-// // Query database
-// let deletedRow = 2;
-
-// db.query(`DELETE FROM books WHERE id = ?`, deletedRow,(err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
-
-// // Query database
-// db.query('SELECT * FROM departments', function (err, results) {
-//   console.log(results);
-// });
-
-function deptdata() {
-
-    sqlQuery.findAllDepartments().then(([data]) => {
-
-        var arr = [];
-        for (i = 0; i < data.length; i++) {
-            arr[i] = data[i].names;
-        }
-
-        inquirer.prompt(choiceQuestion).then((response) => {
-            input = response.Choice;
-            console.log("user input: " + input);
-        })
-    })
-}
-
-function addingRole() {
-    sqlQuery.addRole(roleName, salary, input).then(([data]) => {
-        console.table(data);
-    })
-}
-
+//initiating method init
 init()
 
 
