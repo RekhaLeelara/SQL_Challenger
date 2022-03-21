@@ -8,11 +8,13 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 const sqlQuery = require('./db/index')
 var inquirer = require('inquirer');
+const e = require('express');
 var input;
 var arr = [];
 var rolearr = [];
 var managerarr = [];
 var fetchRoleId;
+var Choice;
 
 //Department questions to enter user input
 const department = [
@@ -94,7 +96,6 @@ const addEmployee = [
             }
             return true;
         }
-
     },
     {
         type: 'input',
@@ -199,18 +200,20 @@ function init() {
                 console.log("array data" + arr);
 
                 inquirer.prompt(addRole).then((response) => {
-                    sqlQuery.getDepartmentid(input).then(([data]) => {
-                        sqlQuery.addRole(response.roleName, response.salary, data[1].id);
+                    sqlQuery.getDepartmentid(response.Choice).then(([data]) => {
+                        console.table(data)
+                        sqlQuery.addRole(response.roleName, response.salary, data[0].id);
+                        init()
                     })
                 })
             }
 
             // Handling logic when user choose option 'Add Department'
             else if (response.Choice == 'Add Department') {
-                
+
                 inquirer.prompt(addDept).then((response) => {
                     sqlQuery.addDepartment(response.deptName).then(([data]) => {
-                        console.table(data);
+                        init()
                     })
                 })
             }
@@ -218,12 +221,11 @@ function init() {
             // Handling logic when user choose option 'Update Employee Role'
             else if (response.Choice == 'Update Employee Role') {
                 inquirer.prompt(updateRole).then((response) => {
-                sqlQuery.updateEmployeeRole(response.updateRoleId, response.updateemployeeId).then(([data]) => {
-
-                    init()
+                    sqlQuery.updateEmployeeRole(response.updateRoleId, response.updateemployeeId).then(([data]) => {
+                        init()
+                    })
                 })
-            })
-                
+
             }
 
             // Handling logic when user choose option 'Add Employee'
@@ -235,25 +237,27 @@ function init() {
                 })
 
                 sqlQuery.viewAllManagers().then(([data]) => {
-                    console.table(data);
                     for (i = 0; i < data.length; i++) {
-                        managerarr[i] = data[i].first_name+" "+data[i].last_name;
+                        managerarr[i] = data[i].first_name + " " + data[i].last_name;
                     }
                 })
-
-                console.log("array data" + managerarr);
 
                 inquirer.prompt(addEmployee).then((response) => {
                     splitArr = response.managerName.split(" ");
                     var fName = splitArr[0];
                     var lName = splitArr[1];
                     sqlQuery.getroleid(response.roleName).then(([data]) => {
-                        fetchRoleId = data[1].id;
+                        fetchRoleId = data[0].id;
                     })
                     sqlQuery.viewAllManagerids(fName, lName).then(([data]) => {
-                        sqlQuery.addEmployee(response.firstName, response.lastName, fetchRoleId, data[1].id);
+                        sqlQuery.addEmployee(response.firstName, response.lastName, fetchRoleId, data[0].id);
+                        init()
                     })
                 })
+
+            }
+            else {
+                console.log("GOOD BYE!! Thanks for using the application")
             }
 
         }
