@@ -18,6 +18,8 @@ var salary;
 
 var rolearr = [];
 var managerarr = [];
+var fetchRoleId;
+var managerName = "";
 
 // TODO: Create an array of questions for user input
 const department = [
@@ -113,13 +115,13 @@ const addEmployee = [
         type: 'list',
         message: "Which role would you like to assign?",
         choices: rolearr,
-        name: 'Choice'
+        name: 'roleName'
     },
     {
         type: 'list',
         message: "Which manager would you like the employee to map to?",
         choices: managerarr,
-        name: 'Choice'
+        name: 'managerName'
     }
 ];
 
@@ -183,14 +185,32 @@ function init() {
             else if (response.Choice == 'Add Employee') {
                 sqlQuery.viewAllRoles().then(([data]) => {
                     for (i = 0; i < data.length; i++) {
-                        rolearr[i] = data[i].names;
+                        rolearr[i] = data[i].title;
                     }
                 })
-                console.log("array data" + arr);
 
-                inquirer.prompt(addRole).then((response) => {
-                    sqlQuery.getDepartmentid(input).then(([data]) => {
-                        sqlQuery.addRole(response.roleName, response.salary, data[1].id);
+                sqlQuery.viewAllManagers().then(([data]) => {
+                    console.table(data);
+                    for (i = 0; i < data.length; i++) {
+                        managerarr[i] = data[i].first_name+" "+data[i].last_name;
+                    }
+                })
+
+                console.log("array data" + managerarr);
+
+                inquirer.prompt(addEmployee).then((response) => {
+                    console.log(response);
+                    splitArr = managerName.split(" ");
+                    var fName = splitArr[1];
+                    var lName = splitArr[2];
+                    console.log("fName"+fName);
+                    console.log("lName"+lName);
+                    sqlQuery.getroleid(roleName).then(([data]) => {
+                        console.table(data);
+                        fetchRoleId = data[1].id;
+                    })
+                    sqlQuery.viewAllManagerids(fName, lName).then(([data]) => {
+                        sqlQuery.addRole(firstName, lastName, fetchRoleId, data[1].id);
                     })
                 })
             }
