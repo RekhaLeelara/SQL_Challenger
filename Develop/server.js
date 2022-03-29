@@ -4,17 +4,15 @@ const express = require('express');
 const mysql = require('mysql2');
 
 //Global variables/constants
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3306;
 const app = express();
 const sqlQuery = require('./db/index')
 var inquirer = require('inquirer');
 const e = require('express');
-var input;
 var arr = [];
 var rolearr = [];
 var managerarr = [];
 var fetchRoleId;
-var Choice;
 
 //Department questions to enter user input
 const department = [
@@ -154,9 +152,50 @@ const genericQuest = [
     {
         type: 'list',
         message: "What would you like to do?",
-        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
+        choices: ['Delete Department', 'Delete roles', 'Delete employees', 'View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
         name: 'Choice'
     },
+]
+
+const deleteDept = [
+    {
+        type: 'input',
+        name: 'deleteDept',
+        message: 'Enter the department id to delete',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("department id is mandatory");
+            }
+            return true;
+        }
+    }
+]
+const deleteRole = [
+    {
+        type: 'input',
+        name: 'deleteRole',
+        message: 'Enter the Role id to delete',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("Role id is mandatory");
+            }
+            return true;
+        }
+    }
+]
+
+const deleteEmployee = [
+    {
+        type: 'input',
+        name: 'deleteEmployee',
+        message: 'Enter the Employee id to delete',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("Employee id is mandatory");
+            }
+            return true;
+        }
+    }
 ]
 
 
@@ -168,10 +207,41 @@ function init() {
 
             // Handling logic when user choose option 'View All Departments'
             if (response.Choice == 'View All Departments') {
+
                 sqlQuery.findAllDepartments().then(([data]) => {
                     console.table(data);
                 })
                 init()
+            }
+
+            // Handling logic when user choose option 'Delete Department'
+            else if (response.Choice == 'Delete Department') {
+                inquirer.prompt(deleteDept).then((response) => {
+                    sqlQuery.deleteDepartment('department', response.deleteDept).then(([data]) => {
+                        console.table(data);
+                        init()
+                    })
+                })
+            }
+
+            // Handling logic when user choose option 'Delete Department'
+            else if (response.Choice == 'Delete roles') {
+                inquirer.prompt(deleteRole).then((response) => {
+                    sqlQuery.deleteRole('roles', response.deleteRole).then(([data]) => {
+                        console.table(data);
+                        init()
+                    })
+                })
+            }
+
+            // Handling logic when user choose option 'Delete Department'
+            else if (response.Choice == 'Delete employees') {
+                inquirer.prompt(deleteEmployee).then((response) => {
+                    sqlQuery.deleteEmployee('employee', response.deleteEmployee).then(([data]) => {
+                        console.table(data);
+                        init()
+                    })
+                })
             }
 
             // Handling logic when user choose option 'View All Roles'
@@ -235,13 +305,13 @@ function init() {
                         rolearr[i] = data[i].title;
                     }
                 })
-
+                //Handling logic to view all managers
                 sqlQuery.viewAllManagers().then(([data]) => {
                     for (i = 0; i < data.length; i++) {
                         managerarr[i] = data[i].first_name + " " + data[i].last_name;
                     }
                 })
-
+                //Handling logic to add an employee
                 inquirer.prompt(addEmployee).then((response) => {
                     splitArr = response.managerName.split(" ");
                     var fName = splitArr[0];

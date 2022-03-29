@@ -8,6 +8,19 @@ class sqlQueries{
   constructor(connection){
     this.connection = connection;
   }
+
+    //Query to retrieve all department names
+    deleteDepartment(tableName, id){
+      return this.connection.promise().query("DELETE FROM "+tableName+" WHERE id = '"+id+"';")
+    }
+
+    deleteRole(tableName, id){
+      return this.connection.promise().query("DELETE FROM "+tableName+" WHERE id = '"+id+"';")
+    }
+
+    deleteEmployee(tableName, id){
+      return this.connection.promise().query("DELETE FROM "+tableName+" WHERE id = '"+id+"';")
+    }
   
   //Query to retrieve all department names
   findAllDepartments(){
