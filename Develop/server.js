@@ -152,9 +152,72 @@ const genericQuest = [
     {
         type: 'list',
         message: "What would you like to do?",
-        choices: ['Delete Department', 'Delete roles', 'Delete employees', 'View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
+        choices: ['UpdateEmpManager','viewSalaryByDept','ViewEmpByManager', 'ViewEmpByDept','Delete Department', 'Delete roles', 'Delete employees', 'View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
         name: 'Choice'
     },
+]
+const UpdateEmpManager = [
+    {
+        type: 'input',
+        name: 'UpdateEmpID',
+        message: 'Enter the emp id to update the manager',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("Employee id is mandatory");
+            }
+            return true;
+        }
+    },    
+    {
+        type: 'input',
+        name: 'managerIdToUpdate',
+        message: 'Enter the new manager id to update ',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("manager id is mandatory");
+            }
+            return true;
+        }
+    }
+]
+
+const ViewEmpByDepart = [
+    {
+        type: 'input',
+        name: 'deptName',
+        message: 'Enter the department name to view the list of emp under the dept: ',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("department name is mandatory");
+            }
+            return true;
+        }
+    }
+]
+
+const ViewEmpByManager = [
+    {
+        type: 'input',
+        name: 'managerFirstName',
+        message: 'Enter the manager first name',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("Manager first name is mandatory");
+            }
+            return true;
+        }
+    },    
+    {
+        type: 'input',
+        name: 'managerLastName',
+        message: 'Enter the manager last name',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("anager last name is mandatory");
+            }
+            return true;
+        }
+    }
 ]
 
 const deleteDept = [
@@ -165,6 +228,20 @@ const deleteDept = [
         validate: function (answer) {
             if (answer.length < 1) {
                 return console.log("department id is mandatory");
+            }
+            return true;
+        }
+    }
+]
+
+const viewSalarydept = [
+    {
+        type: 'input',
+        name: 'viewSalaryBYDEPt',
+        message: 'Enter the department name to view the salaries by dept: ',
+        validate: function (answer) {
+            if (answer.length < 1) {
+                return console.log("department name is mandatory");
             }
             return true;
         }
@@ -212,6 +289,44 @@ function init() {
                     console.table(data);
                 })
                 init()
+            }
+
+            else if (response.Choice == 'UpdateEmpManager'){
+                inquirer.prompt(UpdateEmpManager).then((response) => {
+                sqlQuery.updateEmployeeManager(response.managerIdToUpdate, response.UpdateEmpID).then(([data]) => {
+                    console.table(data);
+                    init()
+                })
+            }) 
+            }
+
+            else if (response.Choice == 'ViewEmpByManager'){
+                inquirer.prompt(ViewEmpByManager).then((response) => {
+                sqlQuery.ViewEmpByManager(response.managerFirstName, response.managerLastName).then(([data]) => {
+                    console.table(data);
+                    init()
+                })
+            }) 
+            }
+
+            else if (response.Choice == 'ViewEmpByDept'){
+                inquirer.prompt(ViewEmpByDepart).then((response) => {
+                sqlQuery.ViewEmpByDepartment(response.deptName).then(([data]) => {
+                    console.table(data);
+                    init()
+                })
+            }) 
+            }
+
+            else if (response.Choice == 'viewSalaryByDept'){
+                inquirer.prompt(viewSalarydept).then((response) => {
+                sqlQuery.viewSalaryByDept(response.viewSalaryBYDEPt).then(([data]) => {
+                    console.table(data);
+                    init()
+                })
+            })
+
+    
             }
 
             // Handling logic when user choose option 'Delete Department'

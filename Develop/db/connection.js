@@ -9,7 +9,7 @@ const connection = mysql.createConnection(
       port: 3306,
       user: 'root',
       // MySQL password
-      password: '',
+      password: 'password',
       database: 'employee_db'
     },
     console.log(`Connected to the inventory_db database.`)
