@@ -16,6 +16,10 @@ https://github.com/RekhaLeelara/SQL_Challenger
 
 https://drive.google.com/drive/folders/1YK1wm8a_94JniBnXKRlSObI2GlCeW8tw?usp=sharing
 
+Bonus Points/Part2: https://drive.google.com/file/d/1b29MQukUgFdtzhWGMntPIt0ePu8Qm302/view?usp=sharing OR
+
+https://drive.google.com/drive/folders/1YK1wm8a_94JniBnXKRlSObI2GlCeW8tw (File: SQL_WalkthroughBonusPoints.mov)
+
 ## Built With
 
 Node JS
